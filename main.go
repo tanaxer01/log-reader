@@ -34,10 +34,15 @@ type State struct {
 }
 
 func NewModel() Model {
+	profile := os.Getenv("AWS_PROFILE")
+	if profile == "" {
+		profile = "default"
+	}
+
 	m := Model{
 		page:   selectorPage,
 		state:  &State{},
-		client: fetcher.NewAwsFetcher(),
+		client: fetcher.NewAwsFetcher(profile),
 	}
 
 	return m

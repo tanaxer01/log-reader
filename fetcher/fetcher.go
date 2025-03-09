@@ -11,9 +11,9 @@ type AwsFetcher struct {
 	svc *cloudwatchlogs.Client
 }
 
-func NewAwsFetcher() *AwsFetcher {
+func NewAwsFetcher(profile string) *AwsFetcher {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithSharedConfigProfile("bicevida-dev"),
+		config.WithSharedConfigProfile(profile),
 	)
 	if err != nil {
 		panic(err)
