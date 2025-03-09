@@ -6,23 +6,21 @@ import (
 )
 
 type ViewerState struct {
-	form     *huh.Form
-	selValue string
+	form          *huh.Form
+	selValue      string
+	posibleValues []string
 }
 
 func (m Model) ViewerSwitch() (Model, tea.Cmd) {
 	m.page = viewerPage
 
+	m.state.viewer.posibleValues = m.client.FetchStreams(m.state.selector.selValue)
+
 	m.state.viewer.form = huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Value(&m.state.viewer.selValue).
-				Options(
-					huh.NewOption("United States", "US"),
-					huh.NewOption("Germany", "DE"),
-					huh.NewOption("Brazil", "BR"),
-					huh.NewOption("Canada", "CA"),
-				),
+				Options(huh.NewOptions(m.state.viewer.posibleValues...)...),
 		),
 	)
 

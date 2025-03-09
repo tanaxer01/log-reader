@@ -1,88 +1,36 @@
 package main
 
 import (
-	"time"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 )
 
 type SelectorState struct {
-	form     *huh.Form
-	inpValue string
-	selValue string
+	form          *huh.Form
+	inpValue      string
+	selValue      string
+	posibleValues []string
 }
 
 func (m Model) SelectorInit() tea.Cmd {
 	m.state.selector.form = huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Nombre:").
+				Title("LogGroup name:").
 				Value(&m.state.selector.inpValue),
 			huh.NewSelect[string]().
 				Value(&m.state.selector.selValue).
 				OptionsFunc(func() []huh.Option[string] {
-					s := states[m.state.selector.inpValue]
-					time.Sleep(1000 * time.Millisecond)
-					return huh.NewOptions(s...)
+					if len(m.state.selector.inpValue) > 5 {
+						m.state.selector.posibleValues = m.client.FetchGroups(m.state.selector.inpValue)
+					}
+
+					return huh.NewOptions(m.state.selector.posibleValues...)
 				}, &m.state.selector.inpValue),
 		),
 	)
 
 	return m.state.selector.form.Init()
-}
-
-var states = map[string][]string{
-	"Canada": {
-		"Alberta",
-		"British Columbia",
-		"Manitoba",
-		"New Brunswick",
-		"Newfoundland and Labrador",
-		"North West Territories",
-		"Nova Scotia",
-		"Nunavut",
-		"Ontario",
-		"Prince Edward Island",
-		"Quebec",
-		"Saskatchewan",
-		"Yukon",
-	},
-	"Mexico": {
-		"Aguascalientes",
-		"Baja California",
-		"Baja California Sur",
-		"Campeche",
-		"Chiapas",
-		"Chihuahua",
-		"Coahuila",
-		"Colima",
-		"Durango",
-		"Guanajuato",
-		"Guerrero",
-		"Hidalgo",
-		"Jalisco",
-		"México",
-		"Mexico City",
-		"Michoacán",
-		"Morelos",
-		"Nayarit",
-		"Nuevo León",
-		"Oaxaca",
-		"Puebla",
-		"Querétaro",
-		"Quintana Roo",
-		"San Luis Potosí",
-		"Sinaloa",
-		"Sonora",
-		"Tabasco",
-		"Tamaulipas",
-		"Tlaxcala",
-		"Veracruz",
-		"Ignacio de la Llave",
-		"Yucatán",
-		"Zacatecas",
-	},
 }
 
 func (m Model) SelectorUpdate(msg tea.Msg) (Model, tea.Cmd) {

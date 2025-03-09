@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log-scroller/fetcher"
 	"os"
 
 	"github.com/charmbracelet/bubbles/viewport"
@@ -19,8 +20,10 @@ const (
 type Model struct {
 	page     page
 	pageCant page
+	//
 	ready    bool
 	viewport viewport.Model
+	client   *fetcher.AwsFetcher
 	state    *State
 }
 
@@ -32,17 +35,20 @@ type State struct {
 
 func NewModel() Model {
 	m := Model{
-		page:  loggerPage,
-		state: &State{},
+		page:   selectorPage,
+		state:  &State{},
+		client: fetcher.NewAwsFetcher(),
 	}
 
 	return m
 }
 
 func (m Model) Init() tea.Cmd {
-	// return m.SelectorInit()
-	m, _ = m.LoggerSwitch()
-	return nil
+	return m.SelectorInit()
+	// var cmd tea.Cmd
+	// m, cmd = m.LoggerSwitch()
+
+	// return cmd
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
